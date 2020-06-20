@@ -16,6 +16,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsFragment : Fragment() {
 
+    companion object{
+        public var map : GoogleMap? = null
+    }
+
+
     private val callback = OnMapReadyCallback { googleMap ->
         /**
          * Manipulates the map once available.
@@ -26,9 +31,12 @@ class MapsFragment : Fragment() {
          * install it inside the SupportMapFragment. This method will only be triggered once the
          * user has installed Google Play services and returned to the app.
          */
-        val sydney = LatLng(-34.0, 151.0)
-        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        map = googleMap
+
+        val currentLoc = LatLng(MainActivity.location.latitude, MainActivity.location.longitude)
+        googleMap.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker"))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLoc))
     }
 
     override fun onCreateView(
@@ -44,4 +52,9 @@ class MapsFragment : Fragment() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
     }
+
+
+
+
+
 }
