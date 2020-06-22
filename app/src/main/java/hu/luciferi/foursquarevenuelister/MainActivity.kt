@@ -23,6 +23,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import hu.luciferi.foursquarevenuelister.ui.main.SectionsPagerAdapter
 import java.security.Permission
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    public fun setMap(){
+    private fun setMap(){
         MapsFragment.map?.let{
             val currentLoc = LatLng(location.latitude, location.longitude)
             it.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker"))
@@ -73,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    //permissions & location --> as shown in the developers guide
+    //permissions & location --> developers guide alapján
 
     private val PERMISSION_REQUEST = 17
 
