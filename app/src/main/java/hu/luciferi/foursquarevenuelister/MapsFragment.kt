@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -17,9 +18,10 @@ import com.google.android.gms.maps.model.MarkerOptions
 class MapsFragment : Fragment() {
 
     companion object{
-        public var map : GoogleMap? = null
+        var map : GoogleMap? = null
     }
-
+    private val defaultLat = -34.0
+    private val defaultLng = 151.0
 
     private val callback = OnMapReadyCallback { googleMap ->
         /**
@@ -34,7 +36,7 @@ class MapsFragment : Fragment() {
 
         map = googleMap
 
-        val currentLoc = LatLng(MainActivity.location.latitude, MainActivity.location.longitude)
+        val currentLoc = LatLng(MainActivity.location?.latitude ?: defaultLat, MainActivity.location?.longitude ?: defaultLng)
         googleMap.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLoc))
     }
@@ -54,7 +56,19 @@ class MapsFragment : Fragment() {
     }
 
 
+    override fun onResume() {
+        super.onResume()
+        setMap()
+    }
 
-
-
+    private fun setMap(){
+        if (map == null){
+            Toast.makeText(context, "nincs map", Toast.LENGTH_LONG).show()
+        }
+        map?.let{
+            val currentLoc = LatLng(MainActivity.location?.latitude ?: defaultLat , MainActivity.location?.longitude ?: defaultLng)
+            it.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker"))
+            it.moveCamera(CameraUpdateFactory.newLatLng(currentLoc))
+        }
+    }
 }

@@ -16,11 +16,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.LiveData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import hu.luciferi.foursquarevenuelister.repositories.RetrofitRepository
+import hu.luciferi.foursquarevenuelister.retrofit.model.SearchData
 import hu.luciferi.foursquarevenuelister.ui.main.SectionsPagerAdapter
 import java.security.Permission
 import java.text.SimpleDateFormat
@@ -29,9 +32,14 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     companion object{
-        public lateinit var location: Location
+        var location: Location? = null
+        var searchData : LiveData<List<SearchData>>? = null
 
     }
+
+    private val defaultLat = -34.0
+    private val defaultLng = 151.0
+
 
     private lateinit var fusedLocationClient : FusedLocationProviderClient
 
@@ -48,8 +56,13 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener { view ->
             //recalculate location
             calculateLocation()
-            Snackbar.make(view, "Current location: (${location.altitude};${location.longitude})", Snackbar.LENGTH_LONG)
+
+
+            searchData = RetrofitRepository.getSearchData()
+
+            Snackbar.make(view, "Current location: (${location?.altitude ?: "unknown"};${location?.longitude ?: "unknown"})", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
+
         }
 
 
@@ -57,17 +70,18 @@ class MainActivity : AppCompatActivity() {
         //create location services client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         //start location - Sydney jó lesz, ha már ez az alapértelmezett a MapsFragment-ből
-        location = Location(LocationManager.GPS_PROVIDER).apply {
-            latitude = -34.0
-            longitude = 151.0
+        if (location == null) {
+            location = Location(LocationManager.GPS_PROVIDER).apply {
+                latitude = defaultLat
+                longitude = defaultLng
+            }
         }
-
     }
 
 
     private fun setMap(){
         MapsFragment.map?.let{
-            val currentLoc = LatLng(location.latitude, location.longitude)
+            val currentLoc = LatLng(location?.latitude ?: defaultLat, location?.longitude ?: defaultLng)
             it.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker"))
             it.moveCamera(CameraUpdateFactory.newLatLng(currentLoc))
         }
@@ -111,7 +125,6 @@ class MainActivity : AppCompatActivity() {
     //ezt csak akkor hívjuk meg amikor már ellenőriztük az engedélyeket, szóval fölösleges újra itt is lekérdezni
     @SuppressLint("MissingPermission")
     private fun getLocation(){
-        //toastLong("Getting your current location...")
         fusedLocationClient.lastLocation.addOnSuccessListener {
             location = it
         }
@@ -141,6 +154,13 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         calculateLocation()
+        if (searchData != null) {
+            if (searchData!!.value != null){
+                toastLong(searchData!!.value!!.size.toString())
+            }
+            else toastLong("no value")
+        }
+        else toastLong("no live data")
     }
 
     private fun AppCompatActivity.toastLong(message : String){
