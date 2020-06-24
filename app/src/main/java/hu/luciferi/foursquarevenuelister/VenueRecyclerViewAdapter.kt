@@ -5,16 +5,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.LiveData
+import hu.luciferi.foursquarevenuelister.retrofit.model.SearchData
 
-import hu.luciferi.foursquarevenuelister.dummy.DummyContent.DummyItem
 
-/**
- * [RecyclerView.Adapter] that can display a [DummyItem].
- * TODO: Replace the implementation with code for your data type.
- */
 class VenueRecyclerViewAdapter(
-    private val values: List<DummyItem>
+    private val values: LiveData<List<SearchData>>
 ) : RecyclerView.Adapter<VenueRecyclerViewAdapter.ViewHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        this.listener = listener
+    }
+    private var listener : OnItemClickListener? = null
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -23,19 +30,27 @@ class VenueRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        holder.idView.text = item.id
-        holder.contentView.text = item.content
+        val item = values.value!!.get(position)
+        holder.idView.text = item.name
+        holder.contentView.text = item.location.address
     }
 
-    override fun getItemCount(): Int = values.size
+    override fun getItemCount(): Int = values.value?.size ?: 0
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val idView: TextView = view.findViewById(R.id.item_number)
-        val contentView: TextView = view.findViewById(R.id.content)
-
+        val idView: TextView = view.findViewById(R.id.item_name)
+        val contentView: TextView = view.findViewById(R.id.item_location)
+/*
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
+        }*/
+
+        init {
+            itemView.setOnClickListener {
+                if (listener != null && adapterPosition != RecyclerView.NO_POSITION) {
+                    listener!!.onItemClick(adapterPosition)
+                }
+            }
         }
     }
 }

@@ -8,22 +8,19 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import hu.luciferi.foursquarevenuelister.dummy.DummyContent
+import android.widget.Toast
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import hu.luciferi.foursquarevenuelister.retrofit.model.SearchData
 
 /**
  * A fragment representing a list of Items.
  */
 class VenueFragment : Fragment() {
 
-    private var columnCount = 1
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
-        }
-    }
+    private val viewModel : VenueViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,31 +28,23 @@ class VenueFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_venue_list, container, false)
 
+        val venueAdapter = VenueRecyclerViewAdapter(viewModel.searchData)
+
         // Set the adapter
         if (view is RecyclerView) {
             with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = VenueRecyclerViewAdapter(DummyContent.ITEMS)
+                layoutManager = LinearLayoutManager(context).apply { orientation = RecyclerView.VERTICAL }
+
+                viewModel.searchData.observe(viewLifecycleOwner, Observer {
+                    adapter = venueAdapter
+                })
             }
         }
-        return view
-    }
-
-    companion object {
-
-        // TODO: Customize parameter argument names
-        const val ARG_COLUMN_COUNT = "column-count"
-
-        // TODO: Customize parameter initialization
-        @JvmStatic
-        fun newInstance(columnCount: Int) =
-            VenueFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
-                }
+        venueAdapter.setOnItemClickListener(object : VenueRecyclerViewAdapter.OnItemClickListener{
+            override fun onItemClick(position: Int) {
+                Toast.makeText(context, "clicked on #${position}", Toast.LENGTH_SHORT).show()
             }
+        })
+        return view
     }
 }

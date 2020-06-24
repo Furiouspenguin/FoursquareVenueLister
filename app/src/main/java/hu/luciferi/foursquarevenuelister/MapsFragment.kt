@@ -6,22 +6,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsFragment : Fragment() {
 
-    companion object{
-        var map : GoogleMap? = null
-    }
-    private val defaultLat = -34.0
-    private val defaultLng = 151.0
+
+
+    private val viewModel : VenueViewModel by activityViewModels()
+
+
+    private var map : GoogleMap? = null
 
     private val callback = OnMapReadyCallback { googleMap ->
         /**
@@ -36,9 +39,24 @@ class MapsFragment : Fragment() {
 
         map = googleMap
 
-        val currentLoc = LatLng(MainActivity.location?.latitude ?: defaultLat, MainActivity.location?.longitude ?: defaultLng)
-        googleMap.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker"))
+        var currentLoc = LatLng(viewModel.location?.latitude ?: viewModel.defaultLat, viewModel.location?.longitude ?: viewModel.defaultLng)
+        googleMap.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker")).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLoc))
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15.0f))
+
+        viewModel.searchData.observe(viewLifecycleOwner, Observer {
+            if (viewModel.searchData.value != null) {
+            for (item in viewModel.searchData.value!!){
+                if (item.location.lat != null && item.location.lng != null){
+                    currentLoc = LatLng(item.location.lat!!.toDouble(), item.location.lng!!.toDouble())
+                    googleMap.addMarker(MarkerOptions().position(currentLoc).title(item.name))
+                }
+            }
+        }
+        })
+
+
+
     }
 
     override fun onCreateView(
@@ -53,6 +71,7 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
+
     }
 
 
@@ -62,13 +81,11 @@ class MapsFragment : Fragment() {
     }
 
     private fun setMap(){
-        if (map == null){
-            Toast.makeText(context, "nincs map", Toast.LENGTH_LONG).show()
-        }
         map?.let{
-            val currentLoc = LatLng(MainActivity.location?.latitude ?: defaultLat , MainActivity.location?.longitude ?: defaultLng)
-            it.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker"))
+            val currentLoc = LatLng(viewModel.location?.latitude ?: viewModel.defaultLat, viewModel.location?.longitude ?: viewModel.defaultLng)
+            //it.addMarker(MarkerOptions().position(currentLoc).title("Current Location Marker"))
             it.moveCamera(CameraUpdateFactory.newLatLng(currentLoc))
+            it.animateCamera(CameraUpdateFactory.zoomTo(15.0f))
         }
     }
 }
