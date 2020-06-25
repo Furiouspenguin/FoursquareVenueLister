@@ -2,4 +2,9 @@
     <string name="app_name">FoursquareVenueLister</string>
     <string name="tab_list">List</string>
     <string name="tab_map">Map</string>
+    <string name="refresh">Refresh</string>
+    <string name="details_distance_string">\"Distance from location:\"</string>
+    <string name="show_photos">Show photos</string>
+    <string name="photo_of_the_venue">a photo of the venue</string>
+    <string name="address">Address:</string>
 </resources>

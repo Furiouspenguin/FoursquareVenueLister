@@ -19,6 +19,7 @@ interface RetrofitApi {
 */
     //PHOTOS
     @GET("{VENUE_ID}/photos")
-    fun getVenuePhotos(@Path("VENUE_ID") VENUE_ID : String,
-                       @Query("limit") limit : Int) : Call<MetaPhotosResponse>
+    fun getVenuePhotos(@Path("VENUE_ID") VENUE_ID : String
+                       //@Query("limit") limit : Int
+    ) : Call<MetaPhotosResponse>
 }

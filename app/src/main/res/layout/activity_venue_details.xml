@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.main.details.VenueDetailsActivity"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/details_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="28sp"
+        android:layout_marginBottom="16dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/address"
+            />
+
+        <TextView
+            android:id="@+id/details_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/details_distance_string"
+            android:layout_marginEnd="16dp"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/details_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            />
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/details_show_photos_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="22sp"
+        android:layout_marginTop="16dp"
+        android:padding="8dp"
+        android:background="@drawable/round_corners_accent"
+        android:text="@string/show_photos" />
+
+    <ImageView
+        android:layout_margin="16dp"
+        android:id="@+id/details_photo_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@mipmap/ic_launcher"
+        android:visibility="gone"
+        android:contentDescription="@string/photo_of_the_venue" />
+
+
+
+</LinearLayout>

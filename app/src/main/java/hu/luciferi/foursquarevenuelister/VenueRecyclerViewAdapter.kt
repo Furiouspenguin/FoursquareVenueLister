@@ -22,6 +22,7 @@ class VenueRecyclerViewAdapter(
     private var listener : OnItemClickListener? = null
 
 
+    //private var values : List<SearchData> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -30,7 +31,7 @@ class VenueRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values.value!!.get(position)
+        val item = values.value!!.get(position)//values.get(position)
         holder.idView.text = item.name
         holder.contentView.text = item.location.address
     }
@@ -53,4 +54,15 @@ class VenueRecyclerViewAdapter(
             }
         }
     }
+
+    /*
+    fun setData(data : List<SearchData>) {
+        if(data.isEmpty()) {
+            return
+        }
+
+        values = data
+        Log.e("notify","notify")
+        notifyDataSetChanged()
+    }*/
 }

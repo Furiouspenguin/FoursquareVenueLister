@@ -1,11 +1,13 @@
-package hu.luciferi.foursquarevenuelister
+package hu.luciferi.foursquarevenuelister.ui.main.tabs
 
+import android.content.Intent
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 
@@ -16,13 +18,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import hu.luciferi.foursquarevenuelister.R
+import hu.luciferi.foursquarevenuelister.VenueViewModel
+import hu.luciferi.foursquarevenuelister.ui.main.details.VenueDetailsActivity
 
 class MapsFragment : Fragment() {
 
-
-
     private val viewModel : VenueViewModel by activityViewModels()
-
 
     private var map : GoogleMap? = null
 
@@ -46,15 +48,31 @@ class MapsFragment : Fragment() {
 
         viewModel.searchData.observe(viewLifecycleOwner, Observer {
             if (viewModel.searchData.value != null) {
-            for (item in viewModel.searchData.value!!){
-                if (item.location.lat != null && item.location.lng != null){
-                    currentLoc = LatLng(item.location.lat!!.toDouble(), item.location.lng!!.toDouble())
-                    googleMap.addMarker(MarkerOptions().position(currentLoc).title(item.name))
+                //mivel ezekre kattintva is meg kell nyitni a hozzájuk tartozó adatlapot, így el kell menteni rajtuk az indexüket,
+                //hogy aztán a listából meg tudjuk hívni a szükséges adatokat -> ezért az indexeken kell végigmenni
+            for (i in viewModel.searchData.value!!.indices){
+                if (viewModel.searchData.value!![i].location.lat != null && viewModel.searchData.value!![i].location.lng != null){
+                    currentLoc = LatLng(viewModel.searchData.value!![i].location.lat!!.toDouble(), viewModel.searchData.value!![i].location.lng!!.toDouble())
+                    val marker = googleMap.addMarker(MarkerOptions().position(currentLoc).title(viewModel.searchData.value!![i].name))
+                    marker.tag = i
                 }
             }
         }
         })
 
+
+        googleMap.setOnInfoWindowClickListener{marker ->
+            if (marker.title != "Current Location Marker") {
+                val intent = Intent(context, VenueDetailsActivity::class.java).apply {
+                    val venue = viewModel.searchData.value!![marker.tag as Int]
+                    putExtra("name", venue.name)
+                    putExtra("address", venue.location.address)
+                    putExtra("distance", venue.location.distance)
+                    putExtra("id", venue.id)
+                }
+                startActivity(intent)
+            }
+        }
 
 
     }
