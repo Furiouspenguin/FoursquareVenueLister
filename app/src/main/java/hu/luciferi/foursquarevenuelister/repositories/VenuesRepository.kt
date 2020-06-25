@@ -23,6 +23,7 @@ object VenuesRepository {
         retrofitClient.api.getVenueSearchLL("${lat},${lng}").enqueue(object : Callback<MetaSearchResponse>{
             override fun onFailure(call: Call<MetaSearchResponse>, t: Throwable) {
                 Log.e("retrofit search","VenueSearch failed", t)
+                data.value = searchData
             }
 
             override fun onResponse(
@@ -35,6 +36,7 @@ object VenuesRepository {
                 }
                 else {
                     Log.e("retrofit search",response.errorBody()?.string() ?: response.code().toString())
+                    data.value = searchData
                 }
             }
         })

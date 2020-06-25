@@ -30,6 +30,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+        //create location services client
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        if (viewModel.location == null) {
+            calculateLocation(false)
+        }
+
+
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
@@ -37,35 +47,12 @@ class MainActivity : AppCompatActivity() {
         tabs.setupWithViewPager(viewPager)
 
 
-        //create location services client
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        //start location - Sydney jó lesz, ha már ez az alapértelmezett a MapsFragment-ből
-        if (viewModel.location == null) {
-            calculateLocation(false)
-        }
-
 
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menu?.clear()
-        menuInflater.inflate(R.menu.refresh_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId){
-            R.id.menu_refresh -> {
-                calculateLocation(true)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 
 
     //permissions & location --> developers guide alapján
@@ -108,13 +95,13 @@ class MainActivity : AppCompatActivity() {
             if (viewModel.location != it || forceIt) {
                 viewModel.location = it
                 viewModel.refreshSearchData()
-                toastLong("Refreshed data")
+                //toastLong("Refreshed data")
             }
         }
     }
 
     //23as androidtól kezdve kell elkérnie az alkalmazásnak futás közben helyi engedélyeket
-    private fun calculateLocation(forceIt : Boolean){
+    fun calculateLocation(forceIt : Boolean){
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkLocationPermissions()) {
                 getLocation(forceIt)

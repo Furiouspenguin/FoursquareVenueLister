@@ -4,9 +4,7 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -18,6 +16,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import hu.luciferi.foursquarevenuelister.MainActivity
 import hu.luciferi.foursquarevenuelister.R
 import hu.luciferi.foursquarevenuelister.VenueViewModel
 import hu.luciferi.foursquarevenuelister.ui.main.details.VenueDetailsActivity
@@ -27,6 +26,8 @@ class MapsFragment : Fragment() {
     private val viewModel : VenueViewModel by activityViewModels()
 
     private var map : GoogleMap? = null
+
+    private var mapFragment : SupportMapFragment? = null
 
     private val callback = OnMapReadyCallback { googleMap ->
         /**
@@ -38,7 +39,6 @@ class MapsFragment : Fragment() {
          * install it inside the SupportMapFragment. This method will only be triggered once the
          * user has installed Google Play services and returned to the app.
          */
-
         map = googleMap
 
         var currentLoc = LatLng(viewModel.location?.latitude ?: viewModel.defaultLat, viewModel.location?.longitude ?: viewModel.defaultLng)
@@ -77,6 +77,23 @@ class MapsFragment : Fragment() {
 
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.menu_refresh -> {
+                Toast.makeText(context, "Refreshing data... Last datasize: ${viewModel.searchData.value?.size ?: "null"}", Toast.LENGTH_SHORT).show()
+                (activity as MainActivity).calculateLocation(true)
+                mapFragment?.getMapAsync(callback)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -87,10 +104,17 @@ class MapsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
 
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        inflater.inflate(R.menu.refresh_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
 
 
     override fun onResume() {
